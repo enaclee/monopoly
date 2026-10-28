@@ -7,11 +7,11 @@
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b0d12;--fg:#f3f4f6;--cd:#1b1f29;--ln:#394150;color-scheme:dark}}
 :root[data-theme="dark"]{--bg:#0b0d12;--fg:#f3f4f6;--cd:#1b1f29;--ln:#394150;color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
-html,body{height:100%;margin:0;overflow:hidden;font:14px system-ui,sans-serif;touch-action:manipulation}html{background:var(--bg);color:var(--fg)}html.gr{background:linear-gradient(145deg,#09090b,#27272a 58%,#52525b) fixed;color:#fff}html.gr button,html.gr input{background:#fff;color:#111827;box-shadow:none}html.gr .pr{background:#111827;color:#fff}html.gr .pc{background:#fff2;color:#fff;border-color:#fff6}.mc{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:16px;border-radius:20px;margin:0;font-size:17px;background:#fff3!important;color:#fff!important;box-shadow:inset 0 0 0 1px #fff5!important;backdrop-filter:blur(10px)}.mc small{display:block;font-weight:400;font-size:13px;opacity:.85}.mc span{font-size:34px}.mc.pr{background:#fff!important;color:#111827!important}.lgo{font-size:clamp(34px,9vw,56px);font-weight:950;letter-spacing:3px;margin:0;text-shadow:0 8px 32px #0008}.ctr{backdrop-filter:blur(2px)}
+html,body{height:100%;margin:0;overflow:hidden;font:14px system-ui,sans-serif;touch-action:manipulation}html{background:var(--bg);color:var(--fg)}html.gr{background:linear-gradient(145deg,#09090b,#27272a 58%,#52525b) fixed;color:#fff}html.gr button,html.gr input{background:#fff;color:#111827;box-shadow:none}html.gr .pr{background:#111827;color:#fff}html.gr .pc{background:#fff2;color:#fff;border-color:#fff6}.mc{display:flex;align-items:center;justify-content:center;width:100%;text-align:center;padding:15px 16px;border-radius:3px;margin:0;font-size:15px;letter-spacing:.4px;background:#ffffff0b!important;color:#fff!important;border:1px solid #ffffff66!important;box-shadow:none!important;backdrop-filter:blur(10px);min-height:52px}.mc small{display:block;font-weight:400;font-size:12px;letter-spacing:0;opacity:.72;margin-top:5px}.mc.pr{background:#f5f5f4!important;color:#111827!important;border-color:#f5f5f4!important}.lgo{font-family:Georgia,'Times New Roman',serif;font-size:clamp(38px,10vw,62px);font-weight:500;letter-spacing:5px;margin:0;text-shadow:0 8px 32px #0008}.ctr{backdrop-filter:blur(2px)}.menu-rule{width:72px;height:1px;background:#ffffff88;margin:3px auto 8px}.menu-sub{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.65;margin:0 0 18px}
 #app{height:100%;overflow:auto;padding:4px}
-button{font:inherit;font-weight:600;border:0;border-radius:12px;padding:12px 14px;background:var(--cd);color:var(--fg);box-shadow:0 0 0 1px var(--ln);margin:3px}
+button{font:inherit;font-weight:600;border:0;border-radius:4px;padding:12px 14px;background:var(--cd);color:var(--fg);box-shadow:0 0 0 1px var(--ln);margin:3px}
 button.pr{background:var(--ac);color:#fff;box-shadow:none}button:disabled{opacity:.4}
-input{font:inherit;padding:10px;border-radius:10px;border:1px solid var(--ln);background:var(--cd);color:var(--fg);min-width:0;flex:1;-webkit-user-select:text;user-select:text}
+input{font:inherit;padding:10px;border-radius:4px;border:1px solid var(--ln);background:var(--cd);color:var(--fg);min-width:0;flex:1;-webkit-user-select:text;user-select:text}
 .ctr{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;max-width:420px;min-height:100%;margin:auto;padding:12px 8px;text-align:center}
 .row{display:flex;gap:6px;width:100%;align-items:center}.tk{font-size:26px;padding:6px 10px}
 #g{height:100%;display:flex;flex-direction:column}
@@ -116,16 +116,17 @@ const C={c:`Ошибка банка в вашу пользу! +200|m|200
 Штраф за скорость: −15|m|-15
 Кредит погашен: +150|m|150
 Отправляйтесь в тюрьму!|j|0`.split('\n')};
-let G,ST={on:0,c:2,p:[0,1,2,3].map(i=>({n:nick(),t:TK[i]}))},scr='menu',M=0,ON=0,UID,DB,unsub,busy=0,rollFinal=[5,5];
+let G,ST={on:0,c:2,maxPlayers:4,p:[0,1,2,3].map(i=>({n:nick(),t:TK[i]}))},scr='menu',M=0,ON=0,UID,DB,unsub,busy=0,rollFinal=[5,5];
 const P=()=>G.p[G.t],act=()=>!ON||P().u==UID,L=t=>G.log+=t+' ';
 function ask(t,b){M={t,b};render()}const toast=t=>ask(t,[['OK',()=>0]]);function mb(k){let f=M.b[k][1];M=0;f();render()}
 function pos(i){return i<=10?[11,11-i]:i<=20?[21-i,1]:i<=30?[1,i-19]:[i-29,11]}
 function tile(i){let s=S[i],[r,c]=pos(i),o=G.o[i],k=i%10?i<10?0:i<20?1:i<30?2:3:0,tk=G.p.filter(p=>p.pos==i&&!p.bk).map(p=>esc(p.t)).join('');
 return `<div class="t k${k}${i==10?' j':''}" style="grid-area:${r}/${c}${o?`;box-shadow:inset 0 0 0 2px ${PC[o[0]]}`:''}" onclick=tap(${i})>${s.y=='p'?`<i style="background:${GC[s.g]}">${o&&o[1]?(o[1]>4?'🏨':'🏠'.repeat(o[1])):''}</i>`:''}<div class="c${i%10?'':' cr'}">${ic(i)}<b>${s.n}</b>${SB[i]?`<em>${SB[i]}</em>`:''}<u>${'pru'.includes(s.y)?s.pr+'$':''}</u></div><s>${tk}</s></div>`}
-function menuH(){return `<div class=ctr><div style="font-size:44px;letter-spacing:6px">🎩🚗🐕🦆</div><h1 class=lgo>МОНОПОЛИЯ</h1><p style="margin:0 0 14px;opacity:.9">Бросай кубики, покупай улицы, разоряй друзей</p><button class="mc pr" onclick=setup(0)><span>👥</span><div>На одном телефоне<small>2–4 игрока, передавайте телефон по кругу</small></div></button><button class=mc onclick=setup(1)><span>🌐</span><div>По сети с друзьями<small>Комната по коду, игра с разных устройств</small></div></button><button class=mc onclick=fs() style="justify-content:center;padding:12px">⛶ На весь экран</button></div>`}
+function menuH(){return `<div class=ctr><h1 class=lgo>MONOPOLY</h1><div class=menu-rule></div><p class=menu-sub>Стратегия · Торговля · Победа</p><button class="mc pr" onclick=setup(0)>На одном устройстве<small>2–4 игрока · передавайте устройство по кругу</small></button><button class=mc onclick=setup(1)>Игра по сети<small>Создайте комнату и пригласите друзей по коду</small></button><button class=mc onclick=fs()>На весь экран</button></div>`}
 function setup(o){ST.on=o;scr='setup';render()}
 function setH(){let n=ST.on?1:ST.c,h=`<div class=ctr><h2>${ST.on?'Ваш игрок':'Игроки'}</h2>`;
 if(!ST.on)h+=`<div>${[2,3,4].map(k=>`<button class="${k==ST.c?'pr':''}" onclick="ST.c=${k};render()">${k}</button>`).join('')}</div>`;
+if(ST.on)h+=`<p style="margin:0 0 6px;opacity:.8">Максимум игроков в комнате</p><div class=row style="justify-content:center">${[2,3,4].map(k=>`<button class="${k==(ST.maxPlayers||4)?'pr':''}" onclick="ST.maxPlayers=${k};render()">${k}</button>`).join('')}</div>`;
 for(let i=0;i<n;i++)h+=`<div class=row><button class=tk onclick=tok(${i})>${ST.p[i].t}</button><input maxlength=16 value="${esc(ST.p[i].n)}" oninput="ST.p[${i}].n=this.value"><button onclick=rn(${i})>🎲</button></div>`;
 h+=ST.on?`<button class=pr style="width:100%" onclick=mk()>Создать комнату</button><div class=row><input id=code maxlength=4 placeholder="Код комнаты" value="${esc(ST.code||'')}" oninput="ST.code=this.value"><button onclick=jn()>Войти</button></div>`:`<button class=pr style="width:100%" onclick=start()>▶ Начать игру</button>`;
 return h+`<button onclick="scr='menu';render()">← Назад</button></div>`}
@@ -133,7 +134,7 @@ function tok(i){let u=ST.p.slice(0,ST.on?1:ST.c).map(x=>x.t),k=TK.indexOf(ST.p[i
 function rn(i){ST.p[i].n=nick();render()}
 function ng(l){return{p:l.map(x=>({n:x.n||nick(),t:x.t,m:1500,pos:0,j:0,u:x.u})),t:0,o:{},d:[0,0],ph:'roll',dbl:0,log:'Игра началась! Бросайте кубики. ',st:'play',auction:null}}
 function start(){G=ng(ST.p.slice(0,ST.c));ON=0;scr='game';render()}
-function lobH(){return `<div class=ctr><h2>Комната</h2><div style="font-size:48px;font-weight:800;letter-spacing:8px">${esc(ON)}</div><p>Отправьте код друзьям: они вводят его в разделе «По сети».</p>${G.p.map(p=>`<div class=pc style="width:100%">${esc(p.t)} ${esc(p.n)}${p.u==G.host?' 👑':''}</div>`).join('')}<p>Игроков: ${G.p.length} из 4</p>${G.host==UID?`<button class=pr style="width:100%" ${G.p.length<2?'disabled':''} onclick=begin()>▶ Начать игру</button>`:'<p>⏳ Ждём, пока хозяин начнёт игру…</p>'}<button onclick=home()>Выйти</button></div>`}
+function lobH(){const cap=G.maxPlayers||4;return `<div class=ctr><h2>Комната</h2><div style="font-size:48px;font-weight:800;letter-spacing:8px">${esc(ON)}</div><p>Отправьте код друзьям: они вводят его в разделе «Игра по сети».</p>${G.p.map(p=>`<div class=pc style="width:100%">${esc(p.t)} ${esc(p.n)}${p.u==G.host?' · СОЗДАТЕЛЬ':''}</div>`).join('')}<p>Игроков: ${G.p.length} из ${cap}</p>${G.host==UID?`<button class=pr style="width:100%" ${G.p.length<2?'disabled':''} onclick=begin()>Начать игру</button>`:'<p>Ожидание запуска создателем…</p>'}<button onclick=home()>Выйти</button></div>`}
 function dieTrack(i){
  const faces=['⚀','⚁','⚂','⚃','⚄','⚅'];
  const anim=G&&G.anim&&Date.now()-G.anim.at<1500?G.anim:null;
@@ -152,178 +153,4 @@ return `<div id=g><div class=sd>${seats(0)}</div><div class=b>${S.map((_,i)=>til
 
 function auctionMenu(){
  if(!G||scr!=='game')return;
- const props=Object.keys(G.o).filter(k=>G.o[k][0]===G.t);
- ask('Аукцион: выберите недвижимость для продажи игрокам.',[
- ['Клетка '+(G.p[G.t].pos+1)+' — выставить',()=>startAuction(G.p[G.t].pos)],
- ...props.slice(0,4).map(k=>[S[k].f+' — выставить',()=>startAuction(+k)]),
- ['Отмена',()=>0]
- ]);
-}
-function startAuction(i){
- const s=S[i],o=G.o[i];
- if(!s||!['p','r','u'].includes(s.y)|| (o&&o[1]>0)){
-   ask('На аукцион можно выставить свободную улицу или объект без домов.',[['OK',()=>0]]);return;
- }
- G.auction={i,high:0,who:-1,turn:0,passed:[],active:G.p.map((p,j)=>j).filter(j=>!G.p[j].bk),seller:o?o[0]:-1};
- auctionNext();
-}
-function auctionNext(){
- const a=G.auction;if(!a)return;
- a.active=a.active.filter(i=>!G.p[i].bk&&!a.passed.includes(i));
- if(a.active.length<=1 && a.high>0){finishAuction();return}
- if(a.active.length===0){G.auction=null;G.ph='end';save();return}
- const bidder=a.active[a.turn%a.active.length];
- if(a.active.every(i=>a.passed.includes(i))){finishAuction();return}
- ask('Аукцион: '+S[a.i].f+' · ставка '+a.high+'$ · ход: '+G.p[bidder].n,
- [
-  ...[10,25,50].filter(n=>G.p[bidder].m>=a.high+n).map(n=>['Ставка '+(a.high+n)+'$',()=>{a.high+=n;a.who=bidder;a.passed=[];a.turn=(a.active.indexOf(bidder)+1)%a.active.length;auctionNext()}]),
-  ['Пас',()=>{if(!a.passed.includes(bidder))a.passed.push(bidder);a.turn=(a.turn+1)%a.active.length;auctionNext()}]
- ]);
-}
-function finishAuction(){
- const a=G.auction;if(!a)return;
- if(a.who>=0&&a.high>0){
-   const buyer=G.p[a.who];buyer.m-=a.high;
-   if(a.seller>=0)G.p[a.seller].m+=a.high;
-   G.o[a.i]=[a.who,0];L(buyer.n+' выиграл аукцион: '+S[a.i].f+' за '+a.high+'$.');
- }else L('Аукцион завершён без ставок.');
- G.auction=null;G.ph='end';save();
-}
-function financeMenu(){
- if(!G||scr!=='game')return;
- const p=P(), owned=Object.keys(G.o).filter(k=>G.o[k][0]===G.t);
- const b=[['Заложить объект',()=>mortgageMenu()],['Выкупить заложенный объект',()=>redeemMenu()],['Продать дом/отель банку',()=>sellHouseMenu()],['Закрыть',()=>0]];
- ask('Имущество · '+p.m+'$ наличными. Залог даёт половину цены объекта; выкуп стоит 110% цены.',b);
-}
-function mortgageMenu(){
- const own=Object.keys(G.o).filter(k=>G.o[k][0]===G.t&&G.o[k][2]!==true&&G.o[k][1]===0);
- if(!own.length){ask('Нет объектов без домов, которые можно заложить.',[['OK',()=>0]]);return}
- ask('Что заложить?',[...own.slice(0,8).map(k=>[S[k].f+' · получить '+Math.floor(S[k].pr/2)+'$',()=>{const val=Math.floor(S[k].pr/2);G.p[G.t].m+=val;G.o[k][2]=true;L('Залог: '+S[k].f+' +'+val+'$.');save()}]),['Отмена',()=>0]]);
-}
-function redeemMenu(){
- const own=Object.keys(G.o).filter(k=>G.o[k][0]===G.t&&G.o[k][2]===true);
- if(!own.length){ask('У вас нет заложенных объектов.',[['OK',()=>0]]);return}
- ask('Выкуп залога стоит 110% половины цены объекта.',[...own.map(k=>{let v=Math.ceil(S[k].pr*.55);return[S[k].f+' · '+v+'$',()=>{if(P().m<v){ask('Недостаточно денег.',[['OK',()=>0]]);return}P().m-=v;delete G.o[k][2];L('Выкуплен залог: '+S[k].f+'.');save()}]}),['Отмена',()=>0]]);
-}
-function sellHouseMenu(){
- const own=Object.keys(G.o).filter(k=>G.o[k][0]===G.t&&G.o[k][1]>0);
- if(!own.length){ask('У вас нет домов или отелей для продажи.',[['OK',()=>0]]);return}
- ask('Продать улучшение банку за половину стоимости.',own.map(k=>[S[k].f+' · продать улучшение',()=>{const v=Math.floor(HC[S[k].g]/2);G.o[k][1]--;P().m+=v;L('Продано улучшение за '+v+'$.');save()}]).concat([['Отмена',()=>0]]));
-}
-function surrenderAsk(){
- if(!G||scr!=='game')return;
- ask(P().n+', действительно сдаться и выбыть из игры?', [['Да, сдаться',()=>surrender(G.t)],['Остаться',()=>0]]);
-}
-function surrender(i){
- const p=G.p[i];if(!p||p.bk)return;
- p.bk=true;p.m=0;
- Object.keys(G.o).forEach(k=>{if(G.o[k][0]===i)delete G.o[k]});
- L(p.n+' добровольно сдался и выбыл.');
- const alive=G.p.filter(x=>!x.bk);
- if(alive.length<=1){G.w=alive[0]?.n||'—';G.ph='over'}else if(G.t===i)nx();
- save();
-}
-function render(){document.documentElement.className=scr=='game'?'wd':'gr';$('#app').innerHTML=({menu:menuH,setup:setH,lobby:lobH,game:gameH}[scr])()+(M?`<div class=md><div class=mb><p>${esc(M.t)}</p>${M.b.map((b,k)=>`<button onclick=mb(${k})>${b[0]}</button>`).join('')}</div></div>`:'')}
-function save(){if(ON&&DB&&G)DB.ref('rooms/'+ON).set({s:G}).catch(()=>toast('Ошибка сети: проверьте правила Firebase.'));render()}
-function roll(){
- if(G.ph!='roll'||busy)return;
- busy=1;const final=[R(6)+1,R(6)+1];rollFinal=final;
- G.anim={id:(G.anim?.id||0)+1,at:Date.now(),final};
- save();
- setTimeout(()=>{if(!G)return;G.d=final;delete G.anim;busy=0;go(final[0],final[1])},1500);
-}
-function go(a,b){let p=P(),d=a==b;G.d=[a,b];G.card=0;G.log='';G.dbl=d?(G.dbl||0)+1:0;
-if(p.j){if(d){p.j=0;G.dbl=0;L('Дубль — свобода!')}else if(--p.j){L(p.n+' остаётся в тюрьме.');return nx()}else{p.m-=50;L('Платит 50 и выходит.');if(p.m<0)bust(p)}}
-else if(G.dbl>2)return jail(p,'Три дубля подряд!');
-p.bk?fin():mv(a+b)}
-function mv(n){let p=P(),o=p.pos;p.pos=(o+n)%40;if(p.pos<o){p.m+=200;L('+200 за Старт.')}L(p.n+' → '+S[p.pos].f+'.');land(p)}
-function mono(w,g){return S.every((x,j)=>x.y!='p'||x.g!=g||(G.o[j]&&G.o[j][0]==w))}
-function rent(i){let s=S[i],o=G.o[i],w=o[0];if(s.y=='p')return o[1]?s.r[o[1]]:s.r[0]*(mono(w,s.g)?2:1);
-let c=S.filter((x,j)=>x.y==s.y&&G.o[j]&&G.o[j][0]==w).length;return s.y=='r'?25<<(c-1):(G.d[0]+G.d[1])*(c>1?10:4)}
-function pay(p,a,to){p.m-=a;if(to!=null)G.p[to].m+=a;if(p.m<0)bust(p)}
-function bust(p){let i=G.p.indexOf(p);if(p.m>=0)return;
- const assets=Object.keys(G.o).filter(k=>G.o[k][0]===i);
- if(assets.length){p.m=0;ask(p.n+' не хватает денег. Можно заложить имущество или сдаться.',[['Заложить имущество',()=>{G.t=i;mortgageMenu()}],['Сдаться',()=>surrender(i)]]);return}
- p.bk=1;p.m=0;L(p.n+' выбыл: банкротство.');let a=G.p.filter(x=>!x.bk);if(a.length<2){G.w=a[0]?a[0].n:'—';G.ph='over'} }
-function land(p){let s=S[p.pos],o=G.o[p.pos];
-if('pru'.includes(s.y)){if(!o){G.ph='buy';return save()}if(o[0]!=G.t&&!o[2]){let r=rent(p.pos);L('Рента '+r+'$ → '+G.p[o[0]].n+'.');pay(p,r,o[0])}}
-else if(s.y=='t'){L('Налог '+s.pr+'$.');pay(p,s.pr)}
-else if(s.y=='k')return jail(p,'')
-else if(s.y=='c'||s.y=='x')return card(p,s.y);
-fin()}
-function card(p,y){let c=C[y][R(C[y].length)].split('|'),v=+c[2];G.card=[y,c[0]];
-if(c[1]=='m')pay(p,-v);else if(c[1]=='g'){if(v<p.pos){p.m+=200}p.pos=v;return land(p)}
-else if(c[1]=='b'){p.pos=(p.pos+37)%40;return land(p)}else if(c[1]=='j')return jail(p,'');
-else if(c[1]=='e')G.p.forEach((q,i)=>{if(i!=G.t&&!q.bk)pay(q,v,G.t)});
-fin()}
-function jail(p,t){p.pos=10;p.j=3;G.dbl=0;L(t+' '+p.n+' отправляется в тюрьму!');nx()}
-function jp(){let p=P();p.m-=50;p.j=0;G.log=p.n+' заплатил 50 и свободен. ';save()}
-function buy(){let p=P(),s=S[p.pos];if(p.m<s.pr)return;p.m-=s.pr;G.o[p.pos]=[G.t,0];L(p.n+' купил '+s.f+'.');fin()}
-function fin(){G.ph=G.w?'over':'end';save()}
-function end(){let p=P();if(G.dbl&&!p.j&&!p.bk&&!G.w){G.ph='roll';save()}else nx()}
-function nx(){do G.t=(G.t+1)%G.p.length;while(G.p[G.t].bk);G.ph=G.w?'over':'roll';G.dbl=0;save()}
-['roll','buy','fin','end','jp'].forEach(k=>{let f=window[k];window[k]=(...a)=>act()&&f(...a)});
-function tap(i){let s=S[i],o=G.o[i],t=s.f+(s.pr?' · '+s.pr+'$':'');
-if(s.y=='p')t+=' · рента: '+s.r.join(' / ');if(o)t+=' · владелец: '+G.p[o[0]].n+(o[1]?' · домов: '+o[1]:'')+(o[2]?' · ЗАЛОЖЕНО':'');
-let b=[['OK',()=>0]];
-if(o&&o[0]==G.t&&s.y=='p'&&act()&&(G.ph=='roll'||G.ph=='end')&&o[1]<5&&!o[2]&&mono(G.t,s.g)){let c=HC[s.g];b.unshift(['🏠 Построить за '+c+'$',()=>{if(P().m<c)return;P().m-=c;o[1]++;G.log=P().n+' строит на '+s.n+'. ';save()}])}
-ask(t,b)}
-function home(){unsub&&unsub();ON=0;G=0;scr='menu';render()}
-function fs(){let e=document.documentElement,f=e.requestFullscreen||e.webkitRequestFullscreen;try{f?f.call(e):toast('iPhone: Поделиться → На экран «Домой» — игра откроется на весь экран')}catch(x){toast('Полноэкранный режим недоступен здесь')}}
-const FIREBASE_CONFIG={
- apiKey:"AIzaSyAA-hz__je1ZPqooz4zwfrB5zs7G1tsxos",
- authDomain:"monopoly-9acf9.firebaseapp.com",
- databaseURL:"https://monopoly-9acf9-default-rtdb.firebaseio.com",
- projectId:"monopoly-9acf9",
- storageBucket:"monopoly-9acf9.firebasestorage.app",
- messagingSenderId:"101408326687",
- appId:"1:101408326687:web:0045971d8dac494b36c12a"
-};
-async function conn(){
- if(DB)return true;
- try{
-  if(!window.firebase)return false;
-  if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);
-  UID=localStorage.getItem('monopoly_player_id');
-  if(!UID){UID='p_'+Math.random().toString(36).slice(2)+Date.now().toString(36);localStorage.setItem('monopoly_player_id',UID);}
-  DB=firebase.database();
-  return true;
- }catch(e){console.error(e);toast('Firebase не подключён. Проверьте настройки Realtime Database и правила доступа.');return false}
-}
-function listen(c){
- if(unsub)unsub();ON=c;const ref=DB.ref('rooms/'+c);
- const cb=ref.on('value',snap=>{
-  const d=snap.val();if(!d||!d.s)return;
-  G=typeof d.s==='string'?JSON.parse(d.s):d.s;
-  scr=G.st==='lobby'?'lobby':'game';
-  if(G.anim&&Date.now()-G.anim.at<1500){rollFinal=G.anim.final;busy=1;setTimeout(()=>{busy=0;render()},Math.max(0,1500-(Date.now()-G.anim.at)))}else busy=0;
-  render();
- },err=>{console.error(err);toast('Потеряна связь с Firebase')});
- unsub=()=>ref.off('value',cb);
-}
-async function mk(){
- if(!await conn())return;
- let c='';const alphabet='ABCDEFGHJKLMNPRSTUVXYZ';for(let i=0;i<4;i++)c+=alphabet[R(alphabet.length)];
- G=ng([{...ST.p[0],u:UID}]);G.st='lobby';G.host=UID;
- try{await DB.ref('rooms/'+c).set({s:G});listen(c)}
- catch(e){console.error(e);toast('Не удалось создать комнату: проверьте правила Realtime Database.')}
-}
-async function jn(){
- let c=(ST.code||'').trim().toUpperCase();if(!c)return;
- if(!await conn())return;
- try{
-  const ref=DB.ref('rooms/'+c),snap=await ref.get();
-  if(!snap.exists())return toast('Комната не найдена');
-  const data=snap.val(),g=typeof data.s==='string'?JSON.parse(data.s):data.s,x={...ST.p[0]};
-  if(!g.p.some(p=>p.u===UID)){
-   if(g.st!=='lobby')return toast('Игра уже идёт');
-   if(g.p.length>=4)return toast('Комната полна');
-   if(g.p.some(p=>p.t===x.t))x.t=TK.find(t=>!g.p.some(p=>p.t===t));
-   g.p.push({n:x.n||nick(),t:x.t,m:1500,pos:0,j:0,u:UID});await ref.set({s:g});
-  }
-  listen(c);
- }catch(e){console.error(e);toast('Ошибка входа. Проверьте код и правила Firebase.')}
-}
-function begin(){G.st='play';scr='game';G.log='Игра началась! Бросайте кубики. ';save()}
-render();
-</script></body></html>
+ const props=Object.keys(G.o).filter(k=>G.o[k][0]===G.t)
