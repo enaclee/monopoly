@@ -47,7 +47,7 @@ html.wd{background:radial-gradient(ellipse at 50% 45%,#0000 40%,#000a 100%),repe
  .cn .side-actions{padding:4px}
  .cn .lg{font-size:11px;max-height:4.2em}
 }
-</style></head><body><div id="app"></div><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+</style></head><body><div id="app"></div><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
 <script>
 const $=s=>document.querySelector(s),R=n=>Math.floor(Math.random()*n),esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
 const AD='Ленивый,Хитрый,Пузатый,Бешеный,Сонный,Дерзкий,Жадный,Пушистый,Грозный,Весёлый,Хмурый,Лихой'.split(','),
@@ -270,20 +270,25 @@ if(o&&o[0]==G.t&&s.y=='p'&&act()&&(G.ph=='roll'||G.ph=='end')&&o[1]<5&&!o[2]&&mo
 ask(t,b)}
 function home(){unsub&&unsub();ON=0;G=0;scr='menu';render()}
 function fs(){let e=document.documentElement,f=e.requestFullscreen||e.webkitRequestFullscreen;try{f?f.call(e):toast('iPhone: Поделиться → На экран «Домой» — игра откроется на весь экран')}catch(x){toast('Полноэкранный режим недоступен здесь')}}
-const FIREBASE_CONFIG_KEY='monopoly_firebase_config_v1';
+const FIREBASE_CONFIG={
+ apiKey:"AIzaSyAA-hz__je1ZPqooz4zwfrB5zs7G1tsxos",
+ authDomain:"monopoly-9acf9.firebaseapp.com",
+ databaseURL:"https://monopoly-9acf9-default-rtdb.firebaseio.com",
+ projectId:"monopoly-9acf9",
+ storageBucket:"monopoly-9acf9.firebasestorage.app",
+ messagingSenderId:"101408326687",
+ appId:"1:101408326687:web:0045971d8dac494b36c12a"
+};
 async function conn(){
  if(DB)return true;
  try{
   if(!window.firebase)return false;
-  let cfg;try{cfg=JSON.parse(localStorage.getItem(FIREBASE_CONFIG_KEY)||'null')}catch(e){}
-  if(!cfg){
-   const raw=prompt('Вставьте Firebase config JSON из Firebase Console → Project settings → Your apps. Обязательны apiKey, authDomain, databaseURL, projectId и appId.');
-   if(!raw)return false;cfg=JSON.parse(raw);localStorage.setItem(FIREBASE_CONFIG_KEY,JSON.stringify(cfg));
-  }
-  if(!firebase.apps.length)firebase.initializeApp(cfg);
-  await firebase.auth().signInAnonymously();
-  UID=firebase.auth().currentUser.uid;DB=firebase.database();return true;
- }catch(e){console.error(e);toast('Firebase не подключён. Проверьте config, Anonymous Auth и Realtime Database.');return false}
+  if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);
+  UID=localStorage.getItem('monopoly_player_id');
+  if(!UID){UID='p_'+Math.random().toString(36).slice(2)+Date.now().toString(36);localStorage.setItem('monopoly_player_id',UID);}
+  DB=firebase.database();
+  return true;
+ }catch(e){console.error(e);toast('Firebase не подключён. Проверьте настройки Realtime Database и правила доступа.');return false}
 }
 function listen(c){
  if(unsub)unsub();ON=c;const ref=DB.ref('rooms/'+c);
