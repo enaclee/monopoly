@@ -152,7 +152,8 @@ else bt=`<button class=pr onclick=end()>${G.dbl&&!p.j&&!p.bk?'🎲 Ещё бро
 return `<div id=g><div class=sd>${seats(0)}</div><div class=b>${S.map((_,i)=>tile(i)).join('')}<div class=cn><i class="dk d1">ОБЩЕСТВЕННАЯ<br>КАЗНА</i><i class="dk d2">?</i><div><b>БАНК</b> · ${p.m}$${p.j?' 🔒':''}</div><div class=dc>${dieTrack(0)}${dieTrack(1)}</div>${G.card?`<div class=cd style="background:${G.card[0]=='c'?'#bfe3f7':'#fbbf6a'}">${G.card[0]=='c'?'🧰 Общественная казна':'❓ Шанс'}: ${esc(G.card[1])}</div>`:''}<div class=lg>${esc(G.log)}</div><div class=main-actions>${bt}</div><div class=side-actions><button onclick="auctionMenu()">🔨 Аукцион</button><button onclick="financeMenu()">🏦 Имущество</button><button onclick="surrenderAsk()">🏳 Сдаться</button></div></div></div><div class=sd>${seats(1)}</div></div>`}
 
 function auctionMenu(){
- if(!G||scr!=='game')return;
+ if(!G||scr!=='game'||G.auction)return;
+ if(!act())return toast('Аукцион запускает игрок, чей сейчас ход.');
  const props=Object.keys(G.o).filter(k=>G.o[k][0]===G.t);
  ask('Аукцион: выберите недвижимость для продажи игрокам.',[
  ['Клетка '+(G.p[G.t].pos+1)+' — выставить',()=>startAuction(G.p[G.t].pos)],
@@ -161,25 +162,29 @@ function auctionMenu(){
  ]);
 }
 function startAuction(i){
+ if(!G||G.auction||!act())return;
  const s=S[i],o=G.o[i];
- if(!s||!['p','r','u'].includes(s.y)|| (o&&o[1]>0)){
-   ask('На аукцион можно выставить свободную улицу или объект без домов.',[['OK',()=>0]]);return;
+ if(!s||!['p','r','u'].includes(s.y)||(o&&(o[1]>0||o[2]))){
+   ask('На аукцион можно выставить свободную улицу или незаложенный объект без домов.',[['OK',()=>0]]);return;
  }
- G.auction={i,high:0,who:-1,turn:0,passed:[],active:G.p.map((p,j)=>j).filter(j=>!G.p[j].bk),seller:o?o[0]:-1};
- auctionNext();
+ const seller=o?o[0]:-1,active=G.p.map((q,j)=>j).filter(j=>!G.p[j].bk&&j!=seller);
+ if(!active.length)return;
+ M=0;G.auction={i,high:0,who:-1,seller,ph:G.ph,passed:[],active,cur:active.includes(G.t)?G.t:active[0]};
+ L('Аукцион: '+s.f+'.');save();
 }
-function auctionNext(){
- const a=G.auction;if(!a)return;
- a.active=a.active.filter(i=>!G.p[i].bk&&!a.passed.includes(i));
- if(a.active.length<=1 && a.high>0){finishAuction();return}
- if(a.active.length===0){G.auction=null;G.ph='end';save();return}
- const bidder=a.active[a.turn%a.active.length];
- if(a.active.every(i=>a.passed.includes(i))){finishAuction();return}
- ask('Аукцион: '+S[a.i].f+' · ставка '+a.high+'$ · ход: '+G.p[bidder].n,
- [
-  ...[10,25,50].filter(n=>G.p[bidder].m>=a.high+n).map(n=>['Ставка '+(a.high+n)+'$',()=>{a.high+=n;a.who=bidder;a.passed=[];a.turn=(a.active.indexOf(bidder)+1)%a.active.length;auctionNext()}]),
-  ['Пас',()=>{if(!a.passed.includes(bidder))a.passed.push(bidder);a.turn=(a.turn+1)%a.active.length;auctionNext()}]
- ]);
+function aNext(){
+ const a=G.auction,rem=a.active.filter(i=>!G.p[i].bk&&!a.passed.includes(i));
+ if(a.who>=0?rem.every(i=>i==a.who):rem.length==0){finishAuction();return}
+ const n=G.p.length;
+ for(let k=1;k<=n;k++){const j=(a.cur+k)%n;if(rem.includes(j)&&j!=a.who){a.cur=j;break}}
+ save();
+}
+function aBid(n){const a=G&&G.auction;if(!a)return;const b=G.p[a.cur];if(ON&&b.u!==UID)return;if(b.m<a.high+n)return;a.high+=n;a.who=a.cur;aNext()}
+function aPass(){const a=G&&G.auction;if(!a)return;const b=G.p[a.cur];if(ON&&b.u!==UID)return;if(!a.passed.includes(a.cur))a.passed.push(a.cur);aNext()}
+function aucH(){
+ const a=G.auction,b=G.p[a.cur],me=!ON||b.u==UID,s=S[a.i];
+ return `<div class=md><div class=mb><p><b>🔨 Аукцион: ${esc(s.f)}</b><br>Цена ${s.pr}$ · ставка ${a.high}$${a.who>=0?' ('+esc(G.p[a.who].n)+')':''}</p>`+
+ (me?`<p>Ход: ${esc(b.n)} · ${b.m}$</p>`+[10,25,50].filter(n=>b.m>=a.high+n).map(n=>`<button class=pr onclick=aBid(${n})>+${n}$ → ${a.high+n}$</button>`).join('')+`<button onclick=aPass()>Пас</button>`:`<p>Ставку делает: ${esc(b.n)}…</p>`)+`</div></div>`;
 }
 function finishAuction(){
  const a=G.auction;if(!a)return;
@@ -188,7 +193,7 @@ function finishAuction(){
    if(a.seller>=0)G.p[a.seller].m+=a.high;
    G.o[a.i]=[a.who,0];L(buyer.n+' выиграл аукцион: '+S[a.i].f+' за '+a.high+'$.');
  }else L('Аукцион завершён без ставок.');
- G.auction=null;G.ph='end';save();
+ G.auction=null;G.ph=a.ph=='buy'?'end':(a.ph||'end');save();
 }
 function financeMenu(){
  if(!G||scr!=='game')return;
@@ -224,7 +229,7 @@ function surrender(i){
  if(alive.length<=1){G.w=alive[0]?.n||'—';G.ph='over'}else if(G.t===i)nx();
  save();
 }
-function render(){let h;try{h=({menu:menuH,setup:setH,lobby:lobH,game:gameH}[scr])()+(M?`<div class=md><div class=mb><p>${esc(M.t)}</p>${M.b.map((b,k)=>`<button onclick=mb(${k})>${b[0]}</button>`).join('')}</div></div>`:'')}catch(e){console.error(e);h=`<div class=ctr><h2>Ошибка отрисовки</h2><p>${esc(e.message||e)}</p><button class=pr onclick=home()>В меню</button></div>`;document.documentElement.className='gr';$('#app').innerHTML=h;return}document.documentElement.className=scr=='game'?'wd':'gr';$('#app').innerHTML=h}
+function render(){let h;try{h=({menu:menuH,setup:setH,lobby:lobH,game:gameH}[scr])()+(G&&scr=='game'&&G.auction?aucH():M?`<div class=md><div class=mb><p>${esc(M.t)}</p>${M.b.map((b,k)=>`<button onclick=mb(${k})>${b[0]}</button>`).join('')}</div></div>`:'')}catch(e){console.error(e);h=`<div class=ctr><h2>Ошибка отрисовки</h2><p>${esc(e.message||e)}</p><button class=pr onclick=home()>В меню</button></div>`;document.documentElement.className='gr';$('#app').innerHTML=h;return}document.documentElement.className=scr=='game'?'wd':'gr';$('#app').innerHTML=h}
 function save(){if(ON&&DB&&G)DB.ref('rooms/'+ON).set({s:JSON.parse(JSON.stringify(G))}).catch(()=>toast('Ошибка сети: проверьте правила Firebase.'));render()}
 function roll(){
  if(G.ph!='roll'||busy)return;
@@ -269,7 +274,7 @@ if(s.y=='p')t+=' · рента: '+s.r.join(' / ');if(o)t+=' · владелец:
 let b=[['OK',()=>0]];
 if(o&&o[0]==G.t&&s.y=='p'&&act()&&(G.ph=='roll'||G.ph=='end')&&o[1]<5&&!o[2]&&mono(G.t,s.g)){let c=HC[s.g];b.unshift(['🏠 Построить за '+c+'$',()=>{if(P().m<c)return;P().m-=c;o[1]++;G.log=P().n+' строит на '+s.n+'. ';save()}])}
 ask(t,b)}
-function home(){unsub&&unsub();ON=0;G=0;scr='menu';render()}
+function home(){unsub&&unsub();try{localStorage.removeItem('monopoly_room')}catch(e){}ON=0;G=0;scr='menu';render()}
 function fs(){let e=document.documentElement,f=e.requestFullscreen||e.webkitRequestFullscreen;try{f?f.call(e):toast('iPhone: Поделиться → На экран «Домой» — игра откроется на весь экран')}catch(x){toast('Полноэкранный режим недоступен здесь')}}
 const FIREBASE_CONFIG={
  apiKey:"AIzaSyAA-hz__je1ZPqooz4zwfrB5zs7G1tsxos",
@@ -297,7 +302,7 @@ function norm(g){
  g.o=o;
  g.d=arr(g.d);if(g.d.length<2)g.d=[0,0];
  g.t=g.t||0;g.dbl=g.dbl||0;g.log=g.log||'';g.card=g.card||0;g.ph=g.ph||'roll';g.st=g.st||'play';
- if(g.auction){const a=g.auction;a.active=arr(a.active);a.passed=arr(a.passed)}else g.auction=null;
+ if(g.auction){const a=g.auction;a.active=arr(a.active);a.passed=arr(a.passed);a.high=a.high||0;a.cur=a.cur||0;if(a.who==null)a.who=-1}else g.auction=null;
  return g;
 }
 async function conn(){
@@ -312,7 +317,7 @@ async function conn(){
  }catch(e){console.error(e);toast('Firebase не подключён. Проверьте настройки Realtime Database и правила доступа.');return false}
 }
 function listen(c){
- if(unsub)unsub();ON=c;const ref=DB.ref('rooms/'+c);
+ if(unsub)unsub();ON=c;try{localStorage.setItem('monopoly_room',c)}catch(e){}const ref=DB.ref('rooms/'+c);
  const cb=ref.on('value',snap=>{
   const d=snap.val();if(!d||!d.s)return;
   G=norm(d.s);
@@ -361,6 +366,18 @@ async function begin(){
   scr='game';render();
  }catch(e){console.error(e);toast('Не удалось начать игру. Проверьте подключение и правила Firebase.');}
 }
+async function resume(){
+ let c=null;try{c=localStorage.getItem('monopoly_room')}catch(e){}
+ if(!c)return;
+ try{
+  if(!await conn())return;
+  const snap=await DB.ref('rooms/'+c).get();
+  if(scr!=='menu'||ON)return;
+  if(snap.exists()&&snap.val().s){const g=norm(snap.val().s);if(g.p.some(p=>p.u===UID)){listen(c);return}}
+  localStorage.removeItem('monopoly_room');
+ }catch(e){console.error(e)}
+}
 window.addEventListener('error',e=>{console.error(e.error||e.message);const a=document.getElementById('app');if(a&&!a.innerHTML.trim())a.innerHTML='<div style="padding:24px;color:white;font:16px system-ui">Не удалось загрузить игру. Обновите страницу или сообщите об ошибке разработчику.</div>';});
 try{render()}catch(e){console.error(e);document.getElementById('app').innerHTML='<div style="padding:24px;color:white;font:16px system-ui">Ошибка запуска: '+String(e.message||e).replace(/[&<>]/g,'')+'</div>'}
+resume();
 </script></body></html>
